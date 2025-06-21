@@ -237,6 +237,20 @@
             box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
         }
 
+        .show-type.tba {
+            background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
+            box-shadow: 0 2px 8px rgba(155, 89, 182, 0.3);
+        }
+
+        .tba-card {
+            border: 2px dashed #9B59B6;
+            background: linear-gradient(135deg, #f8f4ff 0%, #f0ebff 100%);
+        }
+
+        .tba-card::before {
+            background: linear-gradient(90deg, #9B59B6, #8E44AD, #9B59B6);
+        }
+
         .calendar-btn {
             background: linear-gradient(135deg, #4a2c6a 0%, #6a4c8a 100%);
             color: white;
@@ -343,6 +357,70 @@
     </div>
 
     <script>
+        // Future cities with date ranges but TBA performances
+        const futureCities = [
+            {
+                "city": "Minneapolis, MN",
+                "venue": "Orpheum Theatre",
+                "dates": "Aug 5 - Aug 17",
+                "address": "910 Hennepin Ave, Minneapolis, MN 55403"
+            },
+            {
+                "city": "Buffalo, NY",
+                "venue": "Shea's Buffalo Theatre",
+                "dates": "Aug 20 - Aug 24",
+                "address": "646 Main St, Buffalo, NY 14202"
+            },
+            {
+                "city": "Durham, NC",
+                "venue": "Durham Performing Arts Center (DPAC)",
+                "dates": "Sep 2 - Sep 14",
+                "address": "123 Vivian St, Durham, NC 27701"
+            },
+            {
+                "city": "North Charleston, SC",
+                "venue": "North Charleston Performing Arts Center",
+                "dates": "Sep 16 - Sep 21",
+                "address": "5001 Coliseum Dr, North Charleston, SC 29418"
+            },
+            {
+                "city": "Greensboro, NC",
+                "venue": "Steven Tanger Center for the Performing Arts",
+                "dates": "Sep 23 - Sep 28",
+                "address": "One Abe Brenner Place, 300 N Elm St, Greensboro, NC 27401"
+            },
+            {
+                "city": "Detroit, MI",
+                "venue": "Fisher Theatre",
+                "dates": "Oct 1 - Oct 12",
+                "address": "3011 W Grand Blvd, Detroit, MI 48202"
+            },
+            {
+                "city": "East Lansing, MI",
+                "venue": "Wharton Center for Performing Arts",
+                "dates": "Oct 14 - Oct 19",
+                "address": "750 E Shaw Ln, East Lansing, MI 48824"
+            },
+            {
+                "city": "Appleton, WI",
+                "venue": "Fox Cities Performing Arts Center",
+                "dates": "Oct 21 - Oct 26",
+                "address": "400 W College Ave, Appleton, WI 54911"
+            },
+            {
+                "city": "Kansas City, MO",
+                "venue": "Music Hall",
+                "dates": "Oct 28 - Nov 2",
+                "address": "Music Hall, Kansas City, MO"
+            },
+            {
+                "city": "Nashville, TN",
+                "venue": "Tennessee Performing Arts Center (TPAC)",
+                "dates": "Nov 4 - Nov 16",
+                "address": "505 Deaderick St, Nashville, TN 37243"
+            }
+        ];
+
         // Show data from the provided JSON
         const shows = [
             {"Date":"6/24/2025","Day":"Tuesday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"8:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
@@ -457,7 +535,7 @@ END:VCALENDAR`;
                 return showDate >= now;
             });
             
-            if (upcomingShows.length === 0) {
+            if (upcomingShows.length === 0 && futureCities.length === 0) {
                 container.innerHTML = '<div class="update-note">🎭 All scheduled performances have concluded. More dates coming soon!</div>';
                 return;
             }
@@ -498,6 +576,7 @@ END:VCALENDAR`;
             
             container.innerHTML = '';
             
+            // Render confirmed shows first
             Object.values(groupedShows).forEach(group => {
                 const cityDiv = document.createElement('div');
                 cityDiv.className = 'city-group';
@@ -526,6 +605,32 @@ END:VCALENDAR`;
                                 </div>
                             `;
                         }).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(cityDiv);
+            });
+            
+            // Render future cities with TBA performances
+            futureCities.forEach(futureCity => {
+                const cityDiv = document.createElement('div');
+                cityDiv.className = 'city-group';
+                
+                cityDiv.innerHTML = `
+                    <div class="city-header">
+                        <h3 class="city-name">${futureCity.city}</h3>
+                        <p class="city-dates">${futureCity.dates}</p>
+                        <p class="venue-name">${futureCity.venue}</p>
+                    </div>
+                    <div class="shows-grid">
+                        <div class="show-card tba-card">
+                            <div class="show-date">🎭 Shows featuring Beatrice to be announced!</div>
+                            <div class="show-time">Check back soon for specific dates and times</div>
+                            <div class="show-type tba">📅 Coming Soon</div>
+                            <button class="calendar-btn" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                Dates TBA
+                            </button>
+                        </div>
                     </div>
                 `;
                 
