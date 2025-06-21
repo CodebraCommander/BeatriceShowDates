@@ -574,6 +574,18 @@ END:VCALENDAR`;
                 group.dateRange = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
             });
             
+            // Filter out future cities that already have confirmed shows
+            const citiesWithShows = Object.keys(groupedShows);
+            const filteredFutureCities = futureCities.filter(futureCity => {
+                // Check if this future city already has confirmed shows
+                return !citiesWithShows.some(cityWithShows => {
+                    // Extract city name from the grouped shows key (e.g., "Chicago, IL")
+                    const cityName = cityWithShows.split(',')[0].trim();
+                    const futureCityName = futureCity.city.split(',')[0].trim();
+                    return cityName.toLowerCase() === futureCityName.toLowerCase();
+                });
+            });
+            
             container.innerHTML = '';
             
             // Render confirmed shows first
@@ -611,8 +623,8 @@ END:VCALENDAR`;
                 container.appendChild(cityDiv);
             });
             
-            // Render future cities with TBA performances
-            futureCities.forEach(futureCity => {
+            // Render future cities with TBA performances (only those without confirmed shows)
+            filteredFutureCities.forEach(futureCity => {
                 const cityDiv = document.createElement('div');
                 cityDiv.className = 'city-group';
                 
