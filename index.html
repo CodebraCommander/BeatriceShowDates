@@ -251,6 +251,28 @@
             background: linear-gradient(90deg, #9B59B6, #8E44AD, #9B59B6);
         }
 
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        .tickets-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            color: #2c1810;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
         .calendar-btn {
             background: linear-gradient(135deg, #4a2c6a 0%, #6a4c8a 100%);
             color: white;
@@ -261,7 +283,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
+            width: 50%;
             text-decoration: none;
             display: inline-block;
             text-align: center;
@@ -271,6 +293,12 @@
             background: linear-gradient(135deg, #5a3c7a 0%, #7a5c9a 100%);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(74, 44, 106, 0.3);
+        }
+
+        .tickets-btn:hover {
+            background: linear-gradient(135deg, #e4bf47 0%, #f4e04f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
         }
 
         .footer {
@@ -523,6 +551,14 @@ END:VCALENDAR`;
             document.body.removeChild(link);
         }
 
+        function requestTickets(show) {
+            const city = `${show.City.trim()}, ${show.State.trim()}`;
+            const formattedDate = formatDate(show.Date);
+            const subject = encodeURIComponent(`Seeking house seats for ${city} - ${formattedDate} performance`);
+            const mailtoLink = `mailto:caitlin.l.goddard@gmail.com?subject=${subject}`;
+            window.open(mailtoLink);
+        }
+
         function renderShows() {
             const container = document.getElementById('shows-container');
             const now = new Date();
@@ -611,9 +647,14 @@ END:VCALENDAR`;
                                     <div class="show-date">${formatDate(show.Date)}</div>
                                     <div class="show-time">${show.Time} ${show['T/Zone']}</div>
                                     <div class="show-type ${showType}">${showTypeIcon} ${showTypeText}</div>
-                                    <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
-                                        📅 Add to Calendar
-                                    </button>
+                                    <div class="button-group">
+                                        <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
+                                            📧 Request Tickets
+                                        </button>
+                                        <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
+                                            📅 Add to Calendar
+                                        </button>
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
@@ -639,9 +680,14 @@ END:VCALENDAR`;
                             <div class="show-date">🎭 Shows featuring Beatrice to be announced!</div>
                             <div class="show-time">Check back soon for specific dates and times</div>
                             <div class="show-type tba">📅 Coming Soon</div>
-                            <button class="calendar-btn" disabled style="opacity: 0.6; cursor: not-allowed;">
-                                Dates TBA
-                            </button>
+                            <div class="button-group">
+                                <button class="tickets-btn" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                    📧 Request Tickets
+                                </button>
+                                <button class="calendar-btn" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                    Dates TBA
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
