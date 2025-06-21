@@ -151,7 +151,14 @@
         .city-name {
             font-size: 1.8rem;
             font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .city-dates {
+            font-size: 1rem;
+            opacity: 0.85;
             margin-bottom: 0.5rem;
+            font-style: italic;
         }
 
         .venue-name {
@@ -374,6 +381,15 @@
             });
         }
 
+        function formatDateShort(dateStr) {
+            const [month, day, year] = dateStr.split('/');
+            const date = new Date(year, month - 1, day);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
         function createICalFile(show) {
             // Parse MM/DD/YYYY format
             const [month, day, year] = show.Date.split('/');
@@ -431,10 +447,25 @@ END:VCALENDAR`;
 
         function renderShows() {
             const container = document.getElementById('shows-container');
+            const now = new Date();
+            now.setHours(0, 0, 0, 0); // Set to start of today
+            
+            // Filter out past performances
+            const upcomingShows = shows.filter(show => {
+                const [month, day, year] = show.Date.split('/');
+                const showDate = new Date(year, month - 1, day);
+                return showDate >= now;
+            });
+            
+            if (upcomingShows.length === 0) {
+                container.innerHTML = '<div class="update-note">🎭 All scheduled performances have concluded. More dates coming soon!</div>';
+                return;
+            }
+            
             const groupedShows = {};
             
             // Group shows by city
-            shows.forEach(show => {
+            upcomingShows.forEach(show => {
                 const key = `${show.City.trim()}, ${show.State.trim()}`;
                 if (!groupedShows[key]) {
                     groupedShows[key] = {
@@ -447,7 +478,7 @@ END:VCALENDAR`;
                 groupedShows[key].shows.push(show);
             });
             
-            // Sort shows within each city by date
+            // Sort shows within each city by date and calculate date ranges
             Object.values(groupedShows).forEach(group => {
                 group.shows.sort((a, b) => {
                     const [monthA, dayA, yearA] = a.Date.split('/');
@@ -456,6 +487,13 @@ END:VCALENDAR`;
                     const dateB = new Date(yearB, monthB - 1, dayB);
                     return dateA - dateB;
                 });
+                
+                // Calculate date range for city header
+                const firstShow = group.shows[0];
+                const lastShow = group.shows[group.shows.length - 1];
+                const firstDate = formatDateShort(firstShow.Date);
+                const lastDate = formatDateShort(lastShow.Date);
+                group.dateRange = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
             });
             
             container.innerHTML = '';
@@ -467,19 +505,27 @@ END:VCALENDAR`;
                 cityDiv.innerHTML = `
                     <div class="city-header">
                         <h3 class="city-name">${group.city}, ${group.state}</h3>
+                        <p class="city-dates">${group.dateRange}</p>
                         <p class="venue-name">${group.venue}</p>
                     </div>
                     <div class="shows-grid">
-                        ${group.shows.map(show => `
-                            <div class="show-card">
-                                <div class="show-date">${formatDate(show.Date)}</div>
-                                <div class="show-time">${show.Time} ${show['T/Zone']}</div>
-                                <div class="show-type">${show['Mat/Eve'] === 'Put In' ? 'Put In Rehearsal' : show['Mat/Eve']}</div>
-                                <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
-                                    📅 Add to Calendar
-                                </button>
-                            </div>
-                        `).join('')}
+                        ${group.shows.map(show => {
+                            const showType = show['Mat/Eve'].toLowerCase() === 'put in' ? 'put-in' : 
+                                           show['Mat/Eve'].toLowerCase() === 'matinee' ? 'matinee' : 'evening';
+                            const showTypeText = show['Mat/Eve'] === 'Put In' ? 'Put In Rehearsal' : show['Mat/Eve'];
+                            const showTypeIcon = showType === 'matinee' ? '☀️' : showType === 'evening' ? '🌙' : '🎭';
+                            
+                            return `
+                                <div class="show-card">
+                                    <div class="show-date">${formatDate(show.Date)}</div>
+                                    <div class="show-time">${show.Time} ${show['T/Zone']}</div>
+                                    <div class="show-type ${showType}">${showTypeIcon} ${showTypeText}</div>
+                                    <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
+                                        📅 Add to Calendar
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
                 
