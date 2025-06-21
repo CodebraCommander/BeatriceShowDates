@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beatrice in Beauty and the Beast - Tour Dates</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #2c1810;
+            background: linear-gradient(135deg, #f8f4e6 0%, #e8dcc0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, #4a2c6a 0%, #2d1b4e 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="30" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="20" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="60" cy="70" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .beatrice-section {
+            background: white;
+            margin: 2rem 0;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .beatrice-photo-placeholder {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            border: 5px solid #d4af37;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #f8f4e6 0%, #e8dcc0 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-text {
+            font-size: 1rem;
+            color: #4a2c6a;
+            font-weight: bold;
+        }
+
+        .beatrice-name {
+            font-size: 2rem;
+            color: #4a2c6a;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .beatrice-role {
+            font-size: 1.3rem;
+            color: #8b4513;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .beatrice-description {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .shows-section {
+            margin: 2rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            color: #4a2c6a;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        .city-group {
+            background: white;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .city-header {
+            background: linear-gradient(135deg, #4a2c6a 0%, #6a4c8a 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .city-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .venue-name {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .shows-grid {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .show-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f6f0 100%);
+            border: 2px solid #e0d5b7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .show-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #d4af37, #f4d03f, #d4af37);
+        }
+
+        .show-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #d4af37;
+        }
+
+        .show-date {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4a2c6a;
+            margin-bottom: 0.5rem;
+        }
+
+        .show-time {
+            font-size: 1.1rem;
+            color: #8b4513;
+            margin-bottom: 0.5rem;
+        }
+
+        .show-type {
+            display: inline-block;
+            background: #d4af37;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-btn {
+            background: linear-gradient(135deg, #4a2c6a 0%, #6a4c8a 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .calendar-btn:hover {
+            background: linear-gradient(135deg, #5a3c7a 0%, #7a5c9a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 44, 106, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: #4a2c6a;
+            color: white;
+            margin-top: 3rem;
+        }
+
+        .update-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #8b6914;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .shows-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .beatrice-section {
+                padding: 1.5rem;
+            }
+            
+            .beatrice-photo-placeholder {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .photo-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="logo">🌹 Beauty and the Beast 🌹</h1>
+            <p class="subtitle">The Musical</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="beatrice-section">
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACv/2Q==" alt="Beatrice" class="beatrice-photo">
+            <h2 class="beatrice-name">Beatrice</h2>
+            <p class="beatrice-role">as Chip in Disney's Beauty and the Beast</p>
+            <p class="beatrice-description">
+                Join us as Beatrice brings the beloved character of Chip to life in Disney's enchanting musical adaptation of Beauty and the Beast. Follow along to see when she'll be performing in this magical production!
+            </p>
+        </div>
+
+        <div class="update-note">
+            📅 More tour dates will be announced soon! Check back regularly for updates.
+        </div>
+
+        <div class="shows-section">
+            <h2 class="section-title">🎭 Upcoming Performances</h2>
+            <div id="shows-container"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>&copy; 2025 - Come see Beatrice shine as Chip! ✨</p>
+            <p>Disney's Beauty and the Beast - The Musical</p>
+        </div>
+    </div>
+
+    <script>
+        // Show data from the provided JSON
+        const shows = [
+            {"Date":"6/24/2025","Day":"Tuesday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"8:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"6/26/2025","Day":"Thursday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"8:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"6/28/2025","Day":"Saturday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"6/29/2025","Day":"Sunday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"1:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"7/1/2025","Day":"Tuesday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"7/3/2025","Day":"Thursday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"1:30 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
+            {"Date":"7/9/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/11/2025","Day":"Friday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/12/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/13/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"6:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/16/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/18/2025","Day":"Friday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/19/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/20/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"6:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/23/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/25/2025","Day":"Friday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Put In","Time":"12:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/26/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/27/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"1:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/29/2025","Day":"Tuesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/30/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"7/31/2025","Day":"Thursday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
+            {"Date":"8/2/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"}
+        ];
+
+        function formatDate(dateStr) {
+            // Parse MM/DD/YYYY format
+            const [month, day, year] = dateStr.split('/');
+            const date = new Date(year, month - 1, day); // month is 0-indexed
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function createCalendarLink(show) {
+            // Parse MM/DD/YYYY format
+            const [month, day, year] = show.Date.split('/');
+            const date = new Date(year, month - 1, day); // month is 0-indexed
+            
+            const time = show.Time;
+            const timezone = show['T/Zone'] === 'ET' ? 'America/New_York' : 'America/Chicago';
+            
+            // Create ISO date string for the show
+            const timeStr = time.replace(/(\d+):(\d+) (AM|PM)/, (match, hour, minute, ampm) => {
+                let hour24 = parseInt(hour);
+                if (ampm === 'PM' && hour24 !== 12) hour24 += 12;
+                if (ampm === 'AM' && hour24 === 12) hour24 = 0;
+                return `${hour24.toString().padStart(2, '0')}:${minute}:00`;
+            });
+            
+            const startDateTime = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${timeStr}`;
+            
+            // Calculate end time (assume 3 hours for musical)
+            const endDate = new Date(date);
+            const [hours, minutes] = timeStr.split(':');
+            endDate.setHours(parseInt(hours) + 3, parseInt(minutes));
+            const endTimeStr = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}:00`;
+            const endDateTime = `${endDate.getFullYear()}-${(endDate.getMonth() + 1).toString().padStart(2, '0')}-${endDate.getDate().toString().padStart(2, '0')}T${endTimeStr}`;
+            
+            const title = encodeURIComponent(`Beauty and the Beast - Beatrice as Chip`);
+            const details = encodeURIComponent(`Disney's Beauty and the Beast featuring Beatrice as Chip at ${show.Venue}, ${show.City}, ${show.State.trim()}`);
+            const location = encodeURIComponent(`${show.Venue}, ${show['Venue Address']}`);
+            
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}&details=${details}&location=${location}`;
+        }
+
+        function renderShows() {
+            const container = document.getElementById('shows-container');
+            const groupedShows = {};
+            
+            // Group shows by city
+            shows.forEach(show => {
+                const key = `${show.City.trim()}, ${show.State.trim()}`;
+                if (!groupedShows[key]) {
+                    groupedShows[key] = {
+                        city: show.City.trim(),
+                        state: show.State.trim(),
+                        venue: show.Venue,
+                        shows: []
+                    };
+                }
+                groupedShows[key].shows.push(show);
+            });
+            
+            // Sort shows within each city by date
+            Object.values(groupedShows).forEach(group => {
+                group.shows.sort((a, b) => {
+                    const [monthA, dayA, yearA] = a.Date.split('/');
+                    const [monthB, dayB, yearB] = b.Date.split('/');
+                    const dateA = new Date(yearA, monthA - 1, dayA);
+                    const dateB = new Date(yearB, monthB - 1, dayB);
+                    return dateA - dateB;
+                });
+            });
+            
+            container.innerHTML = '';
+            
+            Object.values(groupedShows).forEach(group => {
+                const cityDiv = document.createElement('div');
+                cityDiv.className = 'city-group';
+                
+                cityDiv.innerHTML = `
+                    <div class="city-header">
+                        <h3 class="city-name">${group.city}, ${group.state}</h3>
+                        <p class="venue-name">${group.venue}</p>
+                    </div>
+                    <div class="shows-grid">
+                        ${group.shows.map(show => `
+                            <div class="show-card">
+                                <div class="show-date">${formatDate(show.Date)}</div>
+                                <div class="show-time">${show.Time} ${show['T/Zone']}</div>
+                                <div class="show-type">${show['Mat/Eve'] === 'Put In' ? 'Put In Rehearsal' : show['Mat/Eve']}</div>
+                                <a href="${createCalendarLink(show)}" class="calendar-btn" target="_blank">
+                                    📅 Add to Calendar
+                                </a>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(cityDiv);
+            });
+        }
+
+        // Initialize the page
+        renderShows();
+    </script>
+</body>
+</html>
