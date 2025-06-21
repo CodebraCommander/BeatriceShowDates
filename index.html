@@ -360,36 +360,59 @@
             });
         }
 
-        function createCalendarLink(show) {
+        function createICalFile(show) {
             // Parse MM/DD/YYYY format
             const [month, day, year] = show.Date.split('/');
             const date = new Date(year, month - 1, day); // month is 0-indexed
             
             const time = show.Time;
-            const timezone = show['T/Zone'] === 'ET' ? 'America/New_York' : 'America/Chicago';
             
-            // Create ISO date string for the show
+            // Convert time to 24-hour format
             const timeStr = time.replace(/(\d+):(\d+) (AM|PM)/, (match, hour, minute, ampm) => {
                 let hour24 = parseInt(hour);
                 if (ampm === 'PM' && hour24 !== 12) hour24 += 12;
                 if (ampm === 'AM' && hour24 === 12) hour24 = 0;
-                return `${hour24.toString().padStart(2, '0')}:${minute}:00`;
+                return `${hour24.toString().padStart(2, '0')}${minute}00`;
             });
             
-            const startDateTime = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${timeStr}`;
+            // Format date for iCal (YYYYMMDD)
+            const calDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
             
             // Calculate end time (assume 3 hours for musical)
             const endDate = new Date(date);
-            const [hours, minutes] = timeStr.split(':');
-            endDate.setHours(parseInt(hours) + 3, parseInt(minutes));
-            const endTimeStr = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}:00`;
-            const endDateTime = `${endDate.getFullYear()}-${(endDate.getMonth() + 1).toString().padStart(2, '0')}-${endDate.getDate().toString().padStart(2, '0')}T${endTimeStr}`;
+            const startHour = parseInt(timeStr.substring(0, 2));
+            const startMinute = parseInt(timeStr.substring(2, 4));
+            endDate.setHours(startHour + 3, startMinute);
+            const endTimeStr = `${endDate.getHours().toString().padStart(2, '0')}${endDate.getMinutes().toString().padStart(2, '0')}00`;
+            const endCalDate = `${endDate.getFullYear()}${(endDate.getMonth() + 1).toString().padStart(2, '0')}${endDate.getDate().toString().padStart(2, '0')}`;
             
-            const title = encodeURIComponent(`Beauty and the Beast - Beatrice as Chip`);
-            const details = encodeURIComponent(`Disney's Beauty and the Beast featuring Beatrice as Chip at ${show.Venue}, ${show.City}, ${show.State.trim()}`);
-            const location = encodeURIComponent(`${show.Venue}, ${show['Venue Address']}`);
-            
-            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}&details=${details}&location=${location}`;
+            // Create iCal content
+            const icalContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Beatrice Tour//Beauty and the Beast//EN
+BEGIN:VEVENT
+UID:${Date.now()}@beatrice-tour.com
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTSTART:${calDate}T${timeStr}
+DTEND:${endCalDate}T${endTimeStr}
+SUMMARY:Beauty and the Beast - Beatrice as Chip
+DESCRIPTION:Disney's Beauty and the Beast featuring Beatrice as Chip at ${show.Venue}, ${show.City}, ${show.State.trim()}
+LOCATION:${show.Venue}, ${show['Venue Address']}
+END:VEVENT
+END:VCALENDAR`;
+
+            return icalContent;
+        }
+
+        function downloadICalFile(show) {
+            const icalContent = createICalFile(show);
+            const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `beauty-and-beast-${show.Date.replace(/\//g, '-')}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function renderShows() {
@@ -438,9 +461,9 @@
                                 <div class="show-date">${formatDate(show.Date)}</div>
                                 <div class="show-time">${show.Time} ${show['T/Zone']}</div>
                                 <div class="show-type">${show['Mat/Eve'] === 'Put In' ? 'Put In Rehearsal' : show['Mat/Eve']}</div>
-                                <a href="${createCalendarLink(show)}" class="calendar-btn" target="_blank">
+                                <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
                                     📅 Add to Calendar
-                                </a>
+                                </button>
                             </div>
                         `).join('')}
                     </div>
