@@ -207,13 +207,27 @@
 
         .show-type {
             display: inline-block;
-            background: #d4af37;
             color: white;
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: bold;
             margin-bottom: 1rem;
+        }
+
+        .show-type.matinee {
+            background: linear-gradient(135deg, #87CEEB 0%, #4169E1 100%);
+            box-shadow: 0 2px 8px rgba(65, 105, 225, 0.3);
+        }
+
+        .show-type.evening {
+            background: linear-gradient(135deg, #2C1810 0%, #8B4513 100%);
+            box-shadow: 0 2px 8px rgba(44, 24, 16, 0.4);
+        }
+
+        .show-type.put-in {
+            background: linear-gradient(135deg, #FF6B35 0%, #D2691E 100%);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
         }
 
         .calendar-btn {
