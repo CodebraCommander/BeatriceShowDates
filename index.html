@@ -764,7 +764,7 @@ END:VCALENDAR`;
                             let buttonHtml = '';
                             
                             if (availableSeats > 0) {
-                                availabilityHtml = `<div class="availability-info">��️ ${availableSeats} house seat${availableSeats > 1 ? 's' : ''} available at $${ticketPrice}</div>`;
+                                availabilityHtml = `<div class="availability-info">🎟️ ${availableSeats} house seat${availableSeats > 1 ? 's' : ''} available at $${ticketPrice}</div>`;
                                 buttonHtml = `
                                     <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
                                         📧 Request Tickets
