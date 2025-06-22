@@ -764,14 +764,13 @@ END:VCALENDAR`;
                             let buttonHtml = '';
                             
                             if (availableSeats > 0) {
-                                availabilityHtml = `<div class="availability-info">🎟️ ${availableSeats} free house seat${availableSeats > 1 ? 's' : ''} available!</div>`;
+                                availabilityHtml = `<div class="availability-info">��️ ${availableSeats} house seat${availableSeats > 1 ? 's' : ''} available at $${ticketPrice}</div>`;
                                 buttonHtml = `
                                     <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
-                                        📧 Request Free Seats
+                                        📧 Request Tickets
                                     </button>
                                 `;
                             } else {
-                                availabilityHtml = `<div class="availability-info no-seats">🎫 Tickets available for $${ticketPrice}</div>`;
                                 buttonHtml = ticketUrl ? `
                                     <button class="purchase-btn" onclick="openTicketPurchase('${ticketUrl}')">
                                         🎫 Buy Tickets
