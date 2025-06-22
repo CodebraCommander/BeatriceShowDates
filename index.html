@@ -242,6 +242,23 @@
             box-shadow: 0 2px 8px rgba(155, 89, 182, 0.3);
         }
 
+        .availability-info {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .availability-info.no-seats {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #ffc107;
+            color: #856404;
+        }
+
         .tba-card {
             border: 2px dashed #9B59B6;
             background: linear-gradient(135deg, #f8f4ff 0%, #f0ebff 100%);
@@ -289,6 +306,22 @@
             text-align: center;
         }
 
+        .purchase-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
         .calendar-btn:hover {
             background: linear-gradient(135deg, #5a3c7a 0%, #7a5c9a 100%);
             transform: translateY(-2px);
@@ -299,6 +332,12 @@
             background: linear-gradient(135deg, #e4bf47 0%, #f4e04f 100%);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .purchase-btn:hover {
+            background: linear-gradient(135deg, #218838 0%, #1cc88a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
 
         .footer {
@@ -318,6 +357,13 @@
             margin: 2rem 0;
             text-align: center;
             font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #4a2c6a;
         }
 
         @media (max-width: 768px) {
@@ -373,7 +419,8 @@
 
         <div class="shows-section">
             <h2 class="section-title">🎭 Upcoming Performances</h2>
-            <div id="shows-container"></div>
+            <div id="loading" class="loading">🎭 Loading performance dates...</div>
+            <div id="shows-container" style="display: none;"></div>
         </div>
     </div>
 
@@ -385,6 +432,9 @@
     </div>
 
     <script>
+        // Replace this URL with your Google Apps Script web app URL
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxObNYSY8CV0bccHpZieALvRDEC3yvUnls-TvRJ2i1zSxvx9yLTSIiq6QtB4rSu9Hj7/exec';
+        
         // Future cities with date ranges but TBA performances
         const futureCities = [
             {
@@ -449,35 +499,17 @@
             }
         ];
 
-        // Show data from the provided JSON
-        const shows = [
-            {"Date":"6/24/2025","Day":"Tuesday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"8:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"6/26/2025","Day":"Thursday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"8:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"6/28/2025","Day":"Saturday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"6/29/2025","Day":"Sunday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"1:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"7/1/2025","Day":"Tuesday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"7/3/2025","Day":"Thursday","City":"Schenectady","State":" NY","Venue":"Proctors Theatre","Mat/Eve":"Matinee","Time":"1:30 PM","T/Zone":"ET","Chip":"Beatrice","Venue Address":"432 State St, Schenectady, NY 12305"},
-            {"Date":"7/9/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/11/2025","Day":"Friday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/12/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/13/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"6:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/16/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/18/2025","Day":"Friday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/19/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/20/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"6:30 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/23/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/26/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/27/2025","Day":"Sunday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"1:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/29/2025","Day":"Tuesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/30/2025","Day":"Wednesday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"7/31/2025","Day":"Thursday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Evening","Time":"7:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"},
-            {"Date":"8/2/2025","Day":"Saturday","City":"Chicago","State":" IL","Venue":"Cadillac Palace Theatre","Mat/Eve":"Matinee","Time":"2:00 PM","T/Zone":"CT","Chip":"Beatrice","Venue Address":"151 W Randolph St, Chicago, IL 60601"}
-        ];
+        let shows = []; // This will be populated from Google Sheets
 
         function formatDate(dateStr) {
-            // Parse MM/DD/YYYY format
-            const [month, day, year] = dateStr.split('/');
-            const date = new Date(year, month - 1, day); // month is 0-indexed
+            // Handle both MM/DD/YYYY and other date formats
+            let date;
+            if (typeof dateStr === 'string' && dateStr.includes('/')) {
+                const [month, day, year] = dateStr.split('/');
+                date = new Date(year, month - 1, day);
+            } else {
+                date = new Date(dateStr);
+            }
             return date.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -487,8 +519,13 @@
         }
 
         function formatDateShort(dateStr) {
-            const [month, day, year] = dateStr.split('/');
-            const date = new Date(year, month - 1, day);
+            let date;
+            if (typeof dateStr === 'string' && dateStr.includes('/')) {
+                const [month, day, year] = dateStr.split('/');
+                date = new Date(year, month - 1, day);
+            } else {
+                date = new Date(dateStr);
+            }
             return date.toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric' 
@@ -496,9 +533,13 @@
         }
 
         function createICalFile(show) {
-            // Parse MM/DD/YYYY format
-            const [month, day, year] = show.Date.split('/');
-            const date = new Date(year, month - 1, day); // month is 0-indexed
+            let date;
+            if (typeof show.Date === 'string' && show.Date.includes('/')) {
+                const [month, day, year] = show.Date.split('/');
+                date = new Date(year, month - 1, day);
+            } else {
+                date = new Date(show.Date);
+            }
             
             const time = show.Time;
             
@@ -531,7 +572,7 @@ DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 DTSTART:${calDate}T${timeStr}
 DTEND:${endCalDate}T${endTimeStr}
 SUMMARY:Beauty and the Beast - Beatrice as Chip
-DESCRIPTION:Disney's Beauty and the Beast featuring Beatrice as Chip at ${show.Venue}, ${show.City}, ${show.State.trim()}
+DESCRIPTION:Disney's Beauty and the Beast featuring Beatrice as Chip at ${show.Venue}, ${show.City}, ${show.State ? show.State.toString().trim() : ''}
 LOCATION:${show.Venue}, ${show['Venue Address']}
 END:VEVENT
 END:VCALENDAR`;
@@ -544,18 +585,43 @@ END:VCALENDAR`;
             const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `beauty-and-beast-${show.Date.replace(/\//g, '-')}.ics`;
+            const dateStr = typeof show.Date === 'string' ? show.Date.replace(/\//g, '-') : show.Date;
+            link.download = `beauty-and-beast-${dateStr}.ics`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
         function requestTickets(show) {
-            const city = `${show.City.trim()}, ${show.State.trim()}`;
+            const city = `${show.City ? show.City.toString().trim() : ''}, ${show.State ? show.State.toString().trim() : ''}`;
             const formattedDate = formatDate(show.Date);
             const subject = encodeURIComponent(`Seeking house seats for ${city} - ${formattedDate} performance`);
             const mailtoLink = `mailto:caitlin.l.goddard@gmail.com?subject=${subject}`;
             window.open(mailtoLink);
+        }
+
+        function openTicketPurchase(url) {
+            window.open(url, '_blank');
+        }
+
+        async function loadShowsFromGoogleSheets() {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data from Google Sheets');
+                }
+                const data = await response.json();
+                shows = data;
+                
+                // Hide loading, show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('shows-container').style.display = 'block';
+                
+                renderShows();
+            } catch (error) {
+                console.error('Error loading shows:', error);
+                document.getElementById('loading').innerHTML = '❌ Error loading show data. Please check back later.';
+            }
         }
 
         function renderShows() {
@@ -565,8 +631,13 @@ END:VCALENDAR`;
             
             // Filter out past performances
             const upcomingShows = shows.filter(show => {
-                const [month, day, year] = show.Date.split('/');
-                const showDate = new Date(year, month - 1, day);
+                let showDate;
+                if (typeof show.Date === 'string' && show.Date.includes('/')) {
+                    const [month, day, year] = show.Date.split('/');
+                    showDate = new Date(year, month - 1, day);
+                } else {
+                    showDate = new Date(show.Date);
+                }
                 return showDate >= now;
             });
             
@@ -579,11 +650,13 @@ END:VCALENDAR`;
             
             // Group shows by city
             upcomingShows.forEach(show => {
-                const key = `${show.City.trim()}, ${show.State.trim()}`;
+                const city = show.City ? show.City.toString().trim() : '';
+                const state = show.State ? show.State.toString().trim() : '';
+                const key = `${city}, ${state}`;
                 if (!groupedShows[key]) {
                     groupedShows[key] = {
-                        city: show.City.trim(),
-                        state: show.State.trim(),
+                        city: city,
+                        state: state,
                         venue: show.Venue,
                         shows: []
                     };
@@ -594,10 +667,19 @@ END:VCALENDAR`;
             // Sort shows within each city by date and calculate date ranges
             Object.values(groupedShows).forEach(group => {
                 group.shows.sort((a, b) => {
-                    const [monthA, dayA, yearA] = a.Date.split('/');
-                    const [monthB, dayB, yearB] = b.Date.split('/');
-                    const dateA = new Date(yearA, monthA - 1, dayA);
-                    const dateB = new Date(yearB, monthB - 1, dayB);
+                    let dateA, dateB;
+                    if (typeof a.Date === 'string' && a.Date.includes('/')) {
+                        const [monthA, dayA, yearA] = a.Date.split('/');
+                        dateA = new Date(yearA, monthA - 1, dayA);
+                    } else {
+                        dateA = new Date(a.Date);
+                    }
+                    if (typeof b.Date === 'string' && b.Date.includes('/')) {
+                        const [monthB, dayB, yearB] = b.Date.split('/');
+                        dateB = new Date(yearB, monthB - 1, dayB);
+                    } else {
+                        dateB = new Date(b.Date);
+                    }
                     return dateA - dateB;
                 });
                 
@@ -612,9 +694,7 @@ END:VCALENDAR`;
             // Filter out future cities that already have confirmed shows
             const citiesWithShows = Object.keys(groupedShows);
             const filteredFutureCities = futureCities.filter(futureCity => {
-                // Check if this future city already has confirmed shows
                 return !citiesWithShows.some(cityWithShows => {
-                    // Extract city name from the grouped shows key (e.g., "Chicago, IL")
                     const cityName = cityWithShows.split(',')[0].trim();
                     const futureCityName = futureCity.city.split(',')[0].trim();
                     return cityName.toLowerCase() === futureCityName.toLowerCase();
@@ -641,15 +721,42 @@ END:VCALENDAR`;
                             const showTypeText = show['Mat/Eve'] === 'Put In' ? 'Put In Rehearsal' : show['Mat/Eve'];
                             const showTypeIcon = showType === 'matinee' ? '☀️' : showType === 'evening' ? '🌙' : '🎭';
                             
+                            // Handle availability and pricing
+                            const availableSeats = parseInt(show['Available House Seats']) || 0;
+                            const ticketPrice = show['Ticket Price'] ? parseFloat(show['Ticket Price']) : 0;
+                            const ticketUrl = show['Ticket URL'] || '';
+                            
+                            let availabilityHtml = '';
+                            let buttonHtml = '';
+                            
+                            if (availableSeats > 0) {
+                                availabilityHtml = `<div class="availability-info">🎟️ ${availableSeats} free house seat${availableSeats > 1 ? 's' : ''} available!</div>`;
+                                buttonHtml = `
+                                    <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
+                                        📧 Request Free Seats
+                                    </button>
+                                `;
+                            } else {
+                                availabilityHtml = `<div class="availability-info no-seats">🎫 Tickets available for $${ticketPrice}</div>`;
+                                buttonHtml = ticketUrl ? `
+                                    <button class="purchase-btn" onclick="openTicketPurchase('${ticketUrl}')">
+                                        🎫 Buy Tickets
+                                    </button>
+                                ` : `
+                                    <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
+                                        📧 Contact for Tickets
+                                    </button>
+                                `;
+                            }
+                            
                             return `
                                 <div class="show-card">
                                     <div class="show-date">${formatDate(show.Date)}</div>
                                     <div class="show-time">${show.Time} ${show['T/Zone']}</div>
                                     <div class="show-type ${showType}">${showTypeIcon} ${showTypeText}</div>
+                                    ${availabilityHtml}
                                     <div class="button-group">
-                                        <button class="tickets-btn" onclick="requestTickets(${JSON.stringify(show).replace(/"/g, '&quot;')})">
-                                            📧 Request Tickets
-                                        </button>
+                                        ${buttonHtml}
                                         <button class="calendar-btn" onclick="downloadICalFile(${JSON.stringify(show).replace(/"/g, '&quot;')})">
                                             📅 Add to Calendar
                                         </button>
@@ -688,7 +795,9 @@ END:VCALENDAR`;
         }
 
         // Initialize the page
-        renderShows();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadShowsFromGoogleSheets();
+        });
     </script>
 </body>
 </html>
