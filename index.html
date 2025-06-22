@@ -28,7 +28,7 @@
         .header {
             text-align: center;
             padding: 2rem 0;
-            background: url('BATB_tour_artwork_8x3.5.JPG') center center;
+            background: url('BATB_tour_artwork_8x3.5.JPG') center top;
             background-size: cover;
             background-repeat: no-repeat;
             color: white;
@@ -39,6 +39,16 @@
             align-items: center;
             justify-content: center;
         }
+        
+        /* Responsive adjustment for smaller screens */
+        @media (max-width: 768px) {
+            .header {
+                background-position: center top; /* Focus on top where faces/logo likely are */
+                min-height: 200px; /* Reduce height so it doesn't dominate the screen */
+                padding: 1rem 0;
+            }
+        }
+        
 
         .header::before {
             content: '';
