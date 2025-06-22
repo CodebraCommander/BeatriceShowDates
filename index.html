@@ -500,6 +500,40 @@
         ];
 
         let shows = []; // This will be populated from Google Sheets
+        function formatTime(timeStr, timezone = '') {
+            // Handle various time formats from Google Sheets
+            if (!timeStr) return 'TBA';
+            
+            // If it's already a properly formatted time string, return it
+            if (typeof timeStr === 'string' && timeStr.match(/^\d{1,2}:\d{2}\s?(AM|PM)$/i)) {
+                return `${timeStr} ${timezone}`.trim();
+            }
+            
+            // If it's a date object or ISO string, extract the time
+            let date;
+            if (typeof timeStr === 'string' && timeStr.includes('T')) {
+                date = new Date(timeStr);
+            } else if (timeStr instanceof Date) {
+                date = timeStr;
+            } else {
+                // Try to parse as a date
+                date = new Date(timeStr);
+            }
+            
+            // Check if the date is valid
+            if (isNaN(date.getTime())) {
+                return 'TBA';
+            }
+            
+            // Format the time as 12-hour format
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const displayMinutes = minutes.toString().padStart(2, '0');
+            
+            return `${displayHours}:${displayMinutes} ${ampm} ${timezone}`.trim();
+        }
 
         function formatDate(dateStr) {
             // Handle both MM/DD/YYYY and other date formats
@@ -752,7 +786,7 @@ END:VCALENDAR`;
                             return `
                                 <div class="show-card">
                                     <div class="show-date">${formatDate(show.Date)}</div>
-                                    <div class="show-time">${show.Time} ${show['T/Zone']}</div>
+                                    <div class="show-time">${formatTime(show.Time, show['T/Zone'])}</div>
                                     <div class="show-type ${showType}">${showTypeIcon} ${showTypeText}</div>
                                     ${availabilityHtml}
                                     <div class="button-group">
