@@ -615,35 +615,56 @@ END:VCALENDAR`;
         }
 
         function downloadICalFile(show) {
-            const icalContent = createICalFile(show);
-            
-            // Check if we're on iPhone/Safari
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            
-            if (isIOS || isSafari) {
-                // For iOS/Safari, use data URL approach
-                const dataUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icalContent);
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                const dateStr = typeof show.Date === 'string' ? show.Date.replace(/\//g, '-') : show.Date;
-                link.download = `beauty-and-beast-${dateStr}.ics`;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            // Parse the date and time for the calendar URL
+            let date;
+            if (typeof show.Date === 'string' && show.Date.includes('/')) {
+                const [month, day, year] = show.Date.split('/');
+                date = new Date(year, month - 1, day);
             } else {
-                // For other browsers, use blob URL
-                const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                const dateStr = typeof show.Date === 'string' ? show.Date.replace(/\//g, '-') : show.Date;
-                link.download = `beauty-and-beast-${dateStr}.ics`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+                date = new Date(show.Date);
             }
+            
+            // Format date for calendar URL (YYYYMMDD)
+            const dateStr = date.getFullYear() + 
+                           (date.getMonth() + 1).toString().padStart(2, '0') + 
+                           date.getDate().toString().padStart(2, '0');
+            
+            // Parse time
+            let timeStr = '';
+            if (show.Time) {
+                if (typeof show.Time === 'string' && show.Time.match(/^\d{1,2}:\d{2}\s?(AM|PM)$/i)) {
+                    // Already formatted time
+                    const timeMatch = show.Time.match(/(\d{1,2}):(\d{2})\s?(AM|PM)/i);
+                    if (timeMatch) {
+                        let hour = parseInt(timeMatch[1]);
+                        const minute = timeMatch[2];
+                        const ampm = timeMatch[3].toUpperCase();
+                        
+                        if (ampm === 'PM' && hour !== 12) hour += 12;
+                        if (ampm === 'AM' && hour === 12) hour = 0;
+                        
+                        timeStr = hour.toString().padStart(2, '0') + minute;
+                    }
+                } else {
+                    // Try to parse as date object
+                    const timeDate = new Date(show.Time);
+                    if (!isNaN(timeDate.getTime())) {
+                        timeStr = timeDate.getHours().toString().padStart(2, '0') + 
+                                 timeDate.getMinutes().toString().padStart(2, '0');
+                    }
+                }
+            }
+            
+            // Create calendar URL
+            const eventTitle = encodeURIComponent('Beauty and the Beast - Beatrice as Chip');
+            const eventLocation = encodeURIComponent(`${show.Venue}, ${show.City}, ${show.State ? show.State.toString().trim() : ''}`);
+            const eventDescription = encodeURIComponent(`Disney's Beauty and the Beast featuring Beatrice as Chip`);
+            
+            // Use Google Calendar URL for better mobile compatibility
+            const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${dateStr}T${timeStr}00/${dateStr}T${(parseInt(timeStr) + 3).toString().padStart(2, '0')}${timeStr.substring(2)}00&details=${eventDescription}&location=${eventLocation}`;
+            
+            // Open in new window/tab
+            window.open(calendarUrl, '_blank');
         }
 
         function requestTickets(show) {
