@@ -18,38 +18,28 @@
             background: linear-gradient(135deg, #f8f4e6 0%, #e8dcc0 100%);
             min-height: 100vh;
         }
-
+    
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
-
+    
         .header {
             text-align: center;
-            padding: 2rem 0;
-            background: url('BATB_tour_artwork_8x3.5.JPG') center top;
-            background-size: cover;
-            background-repeat: no-repeat;
+            background-color: white; /* base in case image doesn't load */
+            background: url('BATB_logo_1920x450.jpg') center center no-repeat;
+            background-size: contain;
             color: white;
             position: relative;
             overflow: hidden;
-            min-height: 300px;
+            min-height: 450px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
-        /* Responsive adjustment for smaller screens */
-        @media (max-width: 768px) {
-            .header {
-                background-position: center top; /* Focus on top where faces/logo likely are */
-                min-height: 200px; /* Reduce height so it doesn't dominate the screen */
-                padding: 1rem 0;
-            }
-        }
-        
-
+    
+        /* Optional overlay – if you're keeping it for stylistic effect */
         .header::before {
             content: '';
             position: absolute;
@@ -59,6 +49,20 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.3);
             z-index: 1;
+        }
+    
+        /* Responsive override for mobile */
+        @media (max-width: 768px) {
+            .header {
+                background: url('BATB_tour_artwork_8x3.5.JPG') center top no-repeat;
+                background-size: cover;
+                min-height: 250px;
+                padding: 1rem 0;
+            }
+    
+            .header::before {
+                background: rgba(0, 0, 0, 0.3); /* keep or adjust based on readability */
+            }
         }
 
         .logo {
