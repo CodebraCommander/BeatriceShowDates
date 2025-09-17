@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://script.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://script.google.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -459,11 +459,7 @@
     -->
         <div class="shows-section">
             <h2 class="section-title">🎭 Upcoming Performances</h2>
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <div class="loading-text">🎭 Loading performance dates...</div>
-            </div>
-            <div id="shows-container" style="display: none;"></div>
+            <div id="shows-container"></div>
         </div>
     </div>
 
@@ -475,8 +471,932 @@
     </div>
 
     <script>
-        // Replace this URL with your Google Apps Script web app URL
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxObNYSY8CV0bccHpZieALvRDEC3yvUnls-TvRJ2i1zSxvx9yLTSIiq6QtB4rSu9Hj7/exec';
+        // Embedded show data - no external dependencies
+        const showsData = [
+            {
+                "Date": "6/24/2025",
+                "Day": "Tuesday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "8:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 0,
+                "Ticket Price": "",
+                "Ticket URL": ""
+            },
+            {
+                "Date": "6/26/2025",
+                "Day": "Thursday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "8:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.44",
+                "Ticket URL": "https://tickets.proctors.org/TheatreManager/95/login?event=34217"
+            },
+            {
+                "Date": "6/28/2025",
+                "Day": "Saturday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 0,
+                "Ticket Price": "$129.36",
+                "Ticket URL": "https://tickets.proctors.org/TheatreManager/95/online?performance=114072"
+            },
+            {
+                "Date": "6/29/2025",
+                "Day": "Sunday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 1,
+                "Ticket Price": "$111.44",
+                "Ticket URL": "https://tickets.proctors.org/TheatreManager/95/login?event=34217"
+            },
+            {
+                "Date": "7/1/2025",
+                "Day": "Tuesday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 2,
+                "Ticket Price": "$111.44",
+                "Ticket URL": "https://tickets.proctors.org/TheatreManager/95/login?event=34217"
+            },
+            {
+                "Date": "7/3/2025",
+                "Day": "Thursday",
+                "City": "Schenectady",
+                "State": "NY",
+                "Venue": "Proctors Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "1:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "432 State St, Schenectady, NY 12305",
+                "Available House Seats": 2,
+                "Ticket Price": "$111.44",
+                "Ticket URL": "https://tickets.proctors.org/TheatreManager/95/login?event=34217"
+            },
+            {
+                "Date": "7/9/2025",
+                "Day": "Wednesday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$111.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/11/2025",
+                "Day": "Friday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$111.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/12/2025",
+                "Day": "Saturday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 0,
+                "Ticket Price": "$130.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/13/2025",
+                "Day": "Sunday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/16/2025",
+                "Day": "Wednesday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/18/2025",
+                "Day": "Friday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$130.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/19/2025",
+                "Day": "Saturday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$130.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/20/2025",
+                "Day": "Sunday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/23/2025",
+                "Day": "Wednesday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/26/2025",
+                "Day": "Saturday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$140.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/27/2025",
+                "Day": "Sunday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$140.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/29/2025",
+                "Day": "Tuesday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/30/2025",
+                "Day": "Wednesday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$120.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "7/31/2025",
+                "Day": "Thursday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 2,
+                "Ticket Price": "$130.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            {
+                "Date": "8/2/2025",
+                "Day": "Saturday",
+                "City": "Chicago",
+                "State": "IL",
+                "Venue": "Cadillac Palace Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "151 W Randolph St, Chicago, IL 60601",
+                "Available House Seats": 4,
+                "Ticket Price": "$140.00",
+                "Ticket URL": "https://www.ticketmaster.com/beauty-and-the-beast-(chicago)-tickets/artist/1400967?brand=bicartist"
+            },
+            // Durham, NC shows
+            {
+                "Date": "9/2/2025",
+                "Day": "Tuesday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-02-2025/event/2D0062C7D4365F04?brand=durham"
+            },
+            {
+                "Date": "9/4/2025",
+                "Day": "Thursday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-04-2025/event/2D0062C7D43A5F1B?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/6/2025",
+                "Day": "Saturday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-06-2025/event/2D0062C7D4406044?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/7/2025",
+                "Day": "Sunday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-07-2025/event/2D0062C7D441604C?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/10/2025",
+                "Day": "Wednesday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-10-2025/event/2D0062C7D447605D?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/12/2025",
+                "Day": "Friday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-12-2025/event/2D0062C7D44B6079?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/13/2025",
+                "Day": "Saturday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-13-2025/event/2D0062C7D44D607F?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            {
+                "Date": "9/14/2025",
+                "Day": "Sunday",
+                "City": "Durham",
+                "State": "NC",
+                "Venue": "DPAC",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "123 Vivian Street, Durham, North Carolina 27701",
+                "Available House Seats": 0,
+                "Ticket Price": "$104.40",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-durham-north-carolina-09-14-2025/event/2D0062C7D451608D?brand=durham&refArtist=K8vZ9171hWV&f_simplified_filter=true"
+            },
+            // North Charleston, SC shows
+            {
+                "Date": "9/16/2025",
+                "Day": "Tuesday",
+                "City": "North Charleston",
+                "State": "SC",
+                "Venue": "N. Charleston PAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "5001 Coliseum Drive, North Charleston, South Carolina 29418",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.05",
+                "Ticket URL": "https://www.ticketmaster.com/disney-presents-beauty-and-the-beast-north-charleston-south-carolina-09-16-2025/event/2D0062E2AF8753E0?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "9/18/2025",
+                "Day": "Thursday",
+                "City": "North Charleston",
+                "State": "SC",
+                "Venue": "N. Charleston PAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "5001 Coliseum Drive, North Charleston, South Carolina 29418",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.05",
+                "Ticket URL": "https://www.ticketmaster.com/disney-presents-beauty-and-the-beast-north-charleston-south-carolina-09-18-2025/event/2D0062E2AF8D544B?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "9/20/2025",
+                "Day": "Saturday",
+                "City": "North Charleston",
+                "State": "SC",
+                "Venue": "N. Charleston PAC",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "5001 Coliseum Drive, North Charleston, South Carolina 29418",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.05",
+                "Ticket URL": "https://www.ticketmaster.com/disney-presents-beauty-and-the-beast-north-charleston-south-carolina-09-20-2025/event/2D0062E2AF955504?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "9/21/2025",
+                "Day": "Sunday",
+                "City": "North Charleston",
+                "State": "SC",
+                "Venue": "N. Charleston PAC",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "5001 Coliseum Drive, North Charleston, South Carolina 29418",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.05",
+                "Ticket URL": "https://www.ticketmaster.com/disney-presents-beauty-and-the-beast-north-charleston-south-carolina-09-21-2025/event/2D0062E2AF9B554B?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            // Greensboro, NC shows
+            {
+                "Date": "9/24/2025",
+                "Day": "Wednesday",
+                "City": "Greensboro",
+                "State": "NC",
+                "Venue": "Tanger Center",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "300 North Elm Street, Greensboro, North Carolina 27401",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.50",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-greensboro-north-carolina-09-24-2025/event/2D0062A8E51C7772"
+            },
+            {
+                "Date": "9/26/2025",
+                "Day": "Friday",
+                "City": "Greensboro",
+                "State": "NC",
+                "Venue": "Tanger Center",
+                "Mat/Eve": "Evening",
+                "Time": "8:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "300 North Elm Street, Greensboro, North Carolina 27401",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.50",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-greensboro-north-carolina-09-26-2025/event/2D0062A8E520778F?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "9/27/2025",
+                "Day": "Saturday",
+                "City": "Greensboro",
+                "State": "NC",
+                "Venue": "Tanger Center",
+                "Mat/Eve": "Evening",
+                "Time": "8:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "300 North Elm Street, Greensboro, North Carolina 27401",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.50",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-greensboro-north-carolina-09-27-2025/event/2D0062A8E52277A0?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "9/28/2025",
+                "Day": "Sunday",
+                "City": "Greensboro",
+                "State": "NC",
+                "Venue": "Tanger Center",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "300 North Elm Street, Greensboro, North Carolina 27401",
+                "Available House Seats": 0,
+                "Ticket Price": "$116.50",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-greensboro-north-carolina-09-28-2025/event/2D0062A8E52777BF?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            // Detroit, MI shows
+            {
+                "Date": "10/1/2025",
+                "Day": "Wednesday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/2/2025",
+                "Day": "Thursday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/4/2025",
+                "Day": "Saturday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/5/2025",
+                "Day": "Sunday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/8/2025",
+                "Day": "Wednesday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/10/2025",
+                "Day": "Friday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/11/2025",
+                "Day": "Saturday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            {
+                "Date": "10/12/2025",
+                "Day": "Sunday",
+                "City": "Detroit",
+                "State": "MI",
+                "Venue": "Fisher Theatre",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "3011 W Grand Blvd, Detroit, MI 48202",
+                "Available House Seats": 0,
+                "Ticket Price": "$111.15",
+                "Ticket URL": "https://www.broadwayindetroit.com/events/beauty-and-the-beast/fisher-theatre/calendar/2025-10-01"
+            },
+            // East Lansing, MI shows
+            {
+                "Date": "10/14/2025",
+                "Day": "Tuesday",
+                "City": "East Lansing",
+                "State": "MI",
+                "Venue": "Wharton Center",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "750 E Shaw Ln, East Lansing, MI 48824",
+                "Available House Seats": 0,
+                "Ticket Price": "$103.00",
+                "Ticket URL": "https://whartoncenter.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS:WC:WC2526:GH1014E:&linkID=wharton&dataAccId=778&locale=en_US&siteId=ev_wharton"
+            },
+            {
+                "Date": "10/16/2025",
+                "Day": "Thursday",
+                "City": "East Lansing",
+                "State": "MI",
+                "Venue": "Wharton Center",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "750 E Shaw Ln, East Lansing, MI 48824",
+                "Available House Seats": 0,
+                "Ticket Price": "$103.00",
+                "Ticket URL": "https://whartoncenter.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS:WC:WC2526:GH1016E:&linkID=wharton&dataAccId=778&locale=en_US&siteId=ev_wharton"
+            },
+            {
+                "Date": "10/18/2025",
+                "Day": "Saturday",
+                "City": "East Lansing",
+                "State": "MI",
+                "Venue": "Wharton Center",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "750 E Shaw Ln, East Lansing, MI 48824",
+                "Available House Seats": 0,
+                "Ticket Price": "$103.00",
+                "Ticket URL": "https://whartoncenter.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS:WC:WC2526:GH1018A:&linkID=wharton&dataAccId=778&locale=en_US&siteId=ev_wharton"
+            },
+            {
+                "Date": "10/19/2025",
+                "Day": "Sunday",
+                "City": "East Lansing",
+                "State": "MI",
+                "Venue": "Wharton Center",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "ET",
+                "Chip": "Beatrice",
+                "Venue Address": "750 E Shaw Ln, East Lansing, MI 48824",
+                "Available House Seats": 0,
+                "Ticket Price": "$103.00",
+                "Ticket URL": "https://whartoncenter.evenue.net/cgi-bin/ncommerce3/SEGetEventInfo?ticketCode=GS:WC:WC2526:GH1019A:&linkID=wharton&dataAccId=778&locale=en_US&siteId=ev_wharton"
+            },
+            // Appleton, WI shows
+            {
+                "Date": "10/22/2025",
+                "Day": "Wednesday",
+                "City": "Appleton",
+                "State": "WI",
+                "Venue": "Fox Cities PAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "400 W College Ave, Appleton, WI 54911",
+                "Available House Seats": 0,
+                "Ticket Price": "$151.45",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-appleton-wisconsin-10-22-2025/event/07006301A67C2D3D"
+            },
+            {
+                "Date": "10/24/2025",
+                "Day": "Friday",
+                "City": "Appleton",
+                "State": "WI",
+                "Venue": "Fox Cities PAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "400 W College Ave, Appleton, WI 54911",
+                "Available House Seats": 0,
+                "Ticket Price": "$151.45",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-appleton-wisconsin-10-24-2025/event/07006301A6812DCD?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "10/25/2025",
+                "Day": "Saturday",
+                "City": "Appleton",
+                "State": "WI",
+                "Venue": "Fox Cities PAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "400 W College Ave, Appleton, WI 54911",
+                "Available House Seats": 0,
+                "Ticket Price": "$151.45",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-appleton-wisconsin-10-25-2025/event/07006301A6842DD4?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "10/26/2025",
+                "Day": "Sunday",
+                "City": "Appleton",
+                "State": "WI",
+                "Venue": "Fox Cities PAC",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "400 W College Ave, Appleton, WI 54911",
+                "Available House Seats": 0,
+                "Ticket Price": "$151.45",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-appleton-wisconsin-10-26-2025/event/07006301A68A2E1F?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            // Kansas City, MO shows
+            {
+                "Date": "10/28/2025",
+                "Day": "Tuesday",
+                "City": "Kansas City",
+                "State": "MO",
+                "Venue": "Music Hall",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "301 W 13th St, Kansas City, MO 64105",
+                "Available House Seats": 0,
+                "Ticket Price": "$119.33",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-kansas-city-missouri-10-28-2025/event/060062EBE5D3785F"
+            },
+            {
+                "Date": "10/30/2025",
+                "Day": "Thursday",
+                "City": "Kansas City",
+                "State": "MO",
+                "Venue": "Music Hall",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "301 W 13th St, Kansas City, MO 64105",
+                "Available House Seats": 0,
+                "Ticket Price": "$119.33",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-kansas-city-missouri-10-30-2025/event/060062EBE5DC787A?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "11/1/2025",
+                "Day": "Saturday",
+                "City": "Kansas City",
+                "State": "MO",
+                "Venue": "Music Hall",
+                "Mat/Eve": "Matinee",
+                "Time": "2:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "301 W 13th St, Kansas City, MO 64105",
+                "Available House Seats": 0,
+                "Ticket Price": "$119.33",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-kansas-city-missouri-11-01-2025/event/060062EBE5E47883?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            {
+                "Date": "11/2/2025",
+                "Day": "Sunday",
+                "City": "Kansas City",
+                "State": "MO",
+                "Venue": "Music Hall",
+                "Mat/Eve": "Matinee",
+                "Time": "1:00 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "301 W 13th St, Kansas City, MO 64105",
+                "Available House Seats": 0,
+                "Ticket Price": "$119.33",
+                "Ticket URL": "https://www.ticketmaster.com/disneys-beauty-and-the-beast-touring-kansas-city-missouri-11-02-2025/event/060062EBE5ED789A?refArtist=K8vZ9171hWV&f_simplified_filter=true&f_enable_merch_slot=true"
+            },
+            // Nashville, TN shows (final shows)
+            {
+                "Date": "11/5/2025",
+                "Day": "Wednesday",
+                "City": "Nashville",
+                "State": "TN",
+                "Venue": "TPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "505 Deaderick St, Nashville, TN 37243",
+                "Available House Seats": 0,
+                "Ticket Price": "$100.15",
+                "Ticket URL": "https://cart.tpac.org/14392/14481"
+            },
+            {
+                "Date": "11/7/2025",
+                "Day": "Friday",
+                "City": "Nashville",
+                "State": "TN",
+                "Venue": "TPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "505 Deaderick St, Nashville, TN 37243",
+                "Available House Seats": 0,
+                "Ticket Price": "$100.15",
+                "Ticket URL": "https://cart.tpac.org/14392/14483"
+            },
+            {
+                "Date": "11/8/2025",
+                "Day": "Saturday",
+                "City": "Nashville",
+                "State": "TN",
+                "Venue": "TPAC",
+                "Mat/Eve": "Evening",
+                "Time": "7:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "505 Deaderick St, Nashville, TN 37243",
+                "Available House Seats": 0,
+                "Ticket Price": "$100.15",
+                "Ticket URL": "https://cart.tpac.org/14392/14485"
+            },
+            {
+                "Date": "11/9/2025",
+                "Day": "Sunday",
+                "City": "Nashville",
+                "State": "TN",
+                "Venue": "TPAC",
+                "Mat/Eve": "Evening",
+                "Time": "6:30 PM",
+                "T/Zone": "CT",
+                "Chip": "Beatrice",
+                "Venue Address": "505 Deaderick St, Nashville, TN 37243",
+                "Available House Seats": 0,
+                "Ticket Price": "$100.15",
+                "Ticket URL": "https://cart.tpac.org/14392/14487"
+            }
+        ];
         
         // Future cities with date ranges but TBA performances
         const futureCities = [
@@ -711,46 +1631,17 @@ END:VCALENDAR`;
             window.open(url, '_blank');
         }
 
-        async function loadShowsFromGoogleSheets() {
+        function loadShowsFromEmbeddedData() {
             try {
-                // Add timeout to prevent hanging requests
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                // Use embedded data instead of external fetch
+                shows = showsData;
                 
-                const response = await fetch(GOOGLE_SHEETS_URL, {
-                    signal: controller.signal,
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                // Validate data structure
-                if (!Array.isArray(data)) {
-                    throw new Error('Invalid data format received');
-                }
-                
-                shows = data;
-                
-                // Hide loading, show content
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('shows-container').style.display = 'block';
-                
+                // Render shows immediately since data is already available
                 renderShows();
             } catch (error) {
                 console.error('Error loading shows:', error);
                 
                 // Show fallback content instead of error
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('shows-container').style.display = 'block';
                 document.getElementById('shows-container').innerHTML = `
                     <div class="update-note">
                         🎭 Show data is temporarily unavailable. Please check back later for the latest performance dates!
@@ -930,7 +1821,7 @@ END:VCALENDAR`;
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            loadShowsFromGoogleSheets();
+            loadShowsFromEmbeddedData();
         });
     </script>
 </body>
