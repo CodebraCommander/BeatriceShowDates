@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://script.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://script.google.com;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <title>Beatrice in Beauty and the Beast - Tour Dates</title>
     <style>
         * {
@@ -709,11 +713,31 @@ END:VCALENDAR`;
 
         async function loadShowsFromGoogleSheets() {
             try {
-                const response = await fetch(GOOGLE_SHEETS_URL);
+                // Add timeout to prevent hanging requests
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                clearTimeout(timeoutId);
+                
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data from Google Sheets');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+                
                 const data = await response.json();
+                
+                // Validate data structure
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid data format received');
+                }
+                
                 shows = data;
                 
                 // Hide loading, show content
@@ -723,7 +747,15 @@ END:VCALENDAR`;
                 renderShows();
             } catch (error) {
                 console.error('Error loading shows:', error);
-                document.getElementById('loading').innerHTML = '<div class="spinner"></div><div class="loading-text">❌ Error loading show data. Please check back later.</div>';
+                
+                // Show fallback content instead of error
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('shows-container').style.display = 'block';
+                document.getElementById('shows-container').innerHTML = `
+                    <div class="update-note">
+                        🎭 Show data is temporarily unavailable. Please check back later for the latest performance dates!
+                    </div>
+                `;
             }
         }
 
