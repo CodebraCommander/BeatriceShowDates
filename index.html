@@ -1397,59 +1397,6 @@
                 "Ticket URL": "https://cart.tpac.org/14392/14487"
             }
         ];
-        
-        // Future cities with date ranges but TBA performances
-        const futureCities = [
-           
-            {
-                "city": "Durham, NC",
-                "venue": "Durham Performing Arts Center (DPAC)",
-                "dates": "Sep 2 - Sep 14",
-                "address": "123 Vivian St, Durham, NC 27701"
-            },
-            {
-                "city": "North Charleston, SC",
-                "venue": "North Charleston Performing Arts Center",
-                "dates": "Sep 16 - Sep 21",
-                "address": "5001 Coliseum Dr, North Charleston, SC 29418"
-            },
-            {
-                "city": "Greensboro, NC",
-                "venue": "Steven Tanger Center for the Performing Arts",
-                "dates": "Sep 23 - Sep 28",
-                "address": "One Abe Brenner Place, 300 N Elm St, Greensboro, NC 27401"
-            },
-            {
-                "city": "Detroit, MI",
-                "venue": "Fisher Theatre",
-                "dates": "Oct 1 - Oct 12",
-                "address": "3011 W Grand Blvd, Detroit, MI 48202"
-            },
-            {
-                "city": "East Lansing, MI",
-                "venue": "Wharton Center for Performing Arts",
-                "dates": "Oct 14 - Oct 19",
-                "address": "750 E Shaw Ln, East Lansing, MI 48824"
-            },
-            {
-                "city": "Appleton, WI",
-                "venue": "Fox Cities Performing Arts Center",
-                "dates": "Oct 21 - Oct 26",
-                "address": "400 W College Ave, Appleton, WI 54911"
-            },
-            {
-                "city": "Kansas City, MO",
-                "venue": "Music Hall",
-                "dates": "Oct 28 - Nov 2",
-                "address": "Music Hall, Kansas City, MO"
-            },
-            {
-                "city": "Nashville, TN",
-                "venue": "Tennessee Performing Arts Center (TPAC)",
-                "dates": "Nov 4 - Nov 16",
-                "address": "505 Deaderick St, Nashville, TN 37243"
-            }
-        ];
 
         let shows = []; // This will be populated from Google Sheets
         function formatTime(timeStr, timezone = '') {
@@ -1667,7 +1614,7 @@ END:VCALENDAR`;
                 return showDate >= now;
             });
             
-            if (upcomingShows.length === 0 && futureCities.length === 0) {
+            if (upcomingShows.length === 0) {
                 container.innerHTML = '<div class="update-note">🎭 All scheduled performances have concluded. More dates coming soon!</div>';
                 return;
             }
@@ -1717,15 +1664,7 @@ END:VCALENDAR`;
                 group.dateRange = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
             });
             
-            // Filter out future cities that already have confirmed shows
-            const citiesWithShows = Object.keys(groupedShows);
-            const filteredFutureCities = futureCities.filter(futureCity => {
-                return !citiesWithShows.some(cityWithShows => {
-                    const cityName = cityWithShows.split(',')[0].trim();
-                    const futureCityName = futureCity.city.split(',')[0].trim();
-                    return cityName.toLowerCase() === futureCityName.toLowerCase();
-                });
-            });
+            // All cities now have confirmed shows, so no need to filter future cities
             
             container.innerHTML = '';
             
@@ -1795,28 +1734,7 @@ END:VCALENDAR`;
                 container.appendChild(cityDiv);
             });
             
-            // Render future cities with TBA performances (only those without confirmed shows)
-            filteredFutureCities.forEach(futureCity => {
-                const cityDiv = document.createElement('div');
-                cityDiv.className = 'city-group';
-                
-                cityDiv.innerHTML = `
-                    <div class="city-header">
-                        <h3 class="city-name">${futureCity.city}</h3>
-                        <p class="city-dates">${futureCity.dates}</p>
-                        <p class="venue-name">${futureCity.venue}</p>
-                    </div>
-                    <div class="shows-grid">
-                        <div class="show-card tba-card">
-                            <div class="show-date">🎭 Shows featuring Beatrice to be announced!</div>
-                            <div class="show-time">Check back soon for specific dates and times</div>
-                            <div class="show-type tba">📅 Coming Soon</div>
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(cityDiv);
-            });
+            // All shows are now confirmed, so no need to render future cities
         }
 
         // Initialize the page
