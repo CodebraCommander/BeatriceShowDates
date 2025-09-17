@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <title>Beatrice in Beauty and the Beast - Tour Dates</title>
     <style>
@@ -1580,8 +1579,13 @@ END:VCALENDAR`;
 
         function loadShowsFromEmbeddedData() {
             try {
+                console.log('Loading embedded data...');
+                console.log('showsData length:', showsData.length);
+                
                 // Use embedded data instead of external fetch
                 shows = showsData;
+                
+                console.log('shows variable set to:', shows.length, 'items');
                 
                 // Render shows immediately since data is already available
                 renderShows();
@@ -1602,6 +1606,9 @@ END:VCALENDAR`;
             const now = new Date();
             now.setHours(0, 0, 0, 0); // Set to start of today
             
+            console.log('Total shows available:', shows.length);
+            console.log('Current date for filtering:', now);
+            
             // Filter out past performances
             const upcomingShows = shows.filter(show => {
                 let showDate;
@@ -1611,8 +1618,11 @@ END:VCALENDAR`;
                 } else {
                     showDate = new Date(show.Date);
                 }
+                console.log('Show date:', show.Date, 'Parsed as:', showDate, 'Is upcoming:', showDate >= now);
                 return showDate >= now;
             });
+            
+            console.log('Upcoming shows found:', upcomingShows.length);
             
             if (upcomingShows.length === 0) {
                 container.innerHTML = '<div class="update-note">🎭 All scheduled performances have concluded. More dates coming soon!</div>';
